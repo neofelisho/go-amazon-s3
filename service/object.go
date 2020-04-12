@@ -7,7 +7,7 @@ import (
 	"os"
 )
 
-func ListObjects(bucket string) ([]*s3.Object, error) {
+func ListObject(bucket string) ([]*s3.Object, error) {
 	session, err := CreateSession()
 	if err != nil {
 		return nil, err

@@ -28,7 +28,7 @@ func CreateBucket(bucket string) error {
 	})
 }
 
-func ListBuckets() ([]*s3.Bucket, error) {
+func ListBucket() ([]*s3.Bucket, error) {
 	session, err := CreateSession()
 	if err != nil {
 		return nil, err
