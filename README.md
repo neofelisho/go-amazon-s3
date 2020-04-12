@@ -20,3 +20,12 @@ For GoLand user can set up in `File -> Settings -> Go/Go Modules`:
 
 ![GoLand env variables](
 https://user-images.githubusercontent.com/13026209/79066546-f00c1c00-7ce2-11ea-81d0-4124a764e666.png)
+
+## AWS session
+
+## S3 Implementation
+
+The implementation about S3 bucket is in the `bucket.go`, and about S3 object is in the `object.go`.
+
+For now there are `CreateBucket`, `ListBuckets`, `DeleteBucket`, `ListObjects`, `UploadObject`, `DownloadObject`, 
+`CopyObject`, `DeleteObject`.
