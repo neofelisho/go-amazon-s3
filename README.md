@@ -20,3 +20,19 @@ For GoLand user can set up in `File -> Settings -> Go/Go Modules`:
 
 ![GoLand env variables](
 https://user-images.githubusercontent.com/13026209/79066546-f00c1c00-7ce2-11ea-81d0-4124a764e666.png)
+
+## AWS Session
+
+Before using S3 service, we need to create a session of AWS. We can use `CreateSession` method in the `session.go` to 
+create a new session.
+
+## S3 Implementation
+
+The implementation about S3 bucket is in the `bucket.go`, and about S3 object is in the `object.go`.
+
+For now there are `CreateBucket`, `ListBuckets`, `DeleteBucket`, `ListObjects`, `UploadObject`, `DownloadObject`, 
+`CopyObject`, `DeleteObject`.
+
+## S3 Integration Test
+
+After the implementation of S3 services, we implement the integration tests in `bucket_test.go` and `object_test.go`.
