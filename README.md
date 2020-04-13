@@ -36,3 +36,25 @@ For now there are `CreateBucket`, `ListBuckets`, `DeleteBucket`, `ListObjects`, 
 ## S3 Integration Test
 
 After the implementation of S3 services, we implement the integration tests in `bucket_test.go` and `object_test.go`.
+
+## Dependency Injection
+
+After [this commit](https://github.com/neofelisho/go-amazon-s3/pull/3) we completed the implementation and integration 
+test of S3 service, [repo is here](
+https://github.com/neofelisho/go-amazon-s3/tree/beb823c1d61d975c51e49e5f29231cc6a33c052b).
+
+Now we consider defining an interface `S3 Client` includes all features of S3 service. Then we can use dependency 
+injection and switch among different implementations of `S3 Client`, ex., mock implementation for unit test. 
+
+```go
+type s3Client interface {
+	createBucket(bucket string) error
+	listBuckets() ([]*s3.Bucket, error)
+	deleteBucket(bucket string) error
+	listObjects(bucket string) ([]*s3.Object, error)
+	uploadObject(bucket string, objectKey string, reader io.Reader) error
+	downloadObject(bucket string, objectKey string, writer io.WriterAt) (int64, error)
+	copyObject(sourceBucket string, destBucket string, objectKey string) error
+	deleteObject(bucket string, objectKey string) error
+}
+```
