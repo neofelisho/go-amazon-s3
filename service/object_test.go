@@ -10,6 +10,7 @@ import (
 
 type testData struct {
 	t                *testing.T
+	client           S3Client
 	sourceBucketName string
 	destBucketName   string
 	testFileName     string
@@ -31,8 +32,13 @@ func TestObject(t *testing.T) {
 }
 
 func initTest(t *testing.T) *testData {
+	session, err := CreateSession()
+	assert.NoError(t, err)
+	client := S3Client{session: session}
+
 	return &testData{
 		t:                t,
+		client:           client,
 		sourceBucketName: "source-" + uuid.New().String(),
 		destBucketName:   "dest-" + uuid.New().String(),
 		testFileName:     "test-" + uuid.New().String(),
@@ -55,9 +61,9 @@ func (d *testData) createTestFile() {
 }
 
 func (d testData) createBuckets() {
-	err := CreateBucket(d.sourceBucketName)
+	err := CreateBucket(d.client, d.sourceBucketName)
 	assert.NoError(d.t, err)
-	err = CreateBucket(d.destBucketName)
+	err = CreateBucket(d.client, d.destBucketName)
 	assert.NoError(d.t, err)
 }
 
@@ -66,10 +72,10 @@ func (d *testData) uploadObject() {
 	defer closeFile(d.t, file)
 	assert.NoError(d.t, err)
 
-	err = UploadObject(d.sourceBucketName, file, d.testFileName)
+	err = UploadObject(d.client, d.sourceBucketName, file, d.testFileName)
 	assert.NoError(d.t, err)
 
-	objects, err := ListObject(d.sourceBucketName)
+	objects, err := ListObjects(d.client, d.sourceBucketName)
 	assert.NoError(d.t, err)
 	assert.Len(d.t, objects, 1)
 	assert.Equal(d.t, d.testFileName, *objects[0].Key)
@@ -80,7 +86,7 @@ func (d *testData) downloadObject() {
 	defer closeFile(d.t, file)
 	assert.NoError(d.t, err)
 
-	size, err := DownloadObject(d.sourceBucketName, file, d.testFileName)
+	size, err := DownloadObject(d.client, d.sourceBucketName, file, d.testFileName)
 	assert.NoError(d.t, err)
 
 	b := make([]byte, size)
@@ -91,38 +97,38 @@ func (d *testData) downloadObject() {
 }
 
 func (d *testData) copyObject() {
-	err := CopyObject(d.sourceBucketName, d.destBucketName, d.testFileName)
+	err := CopyObject(d.client, d.sourceBucketName, d.destBucketName, d.testFileName)
 	assert.NoError(d.t, err)
 
-	objects, err := ListObject(d.destBucketName)
+	objects, err := ListObjects(d.client, d.destBucketName)
 	assert.NoError(d.t, err)
 	assert.Len(d.t, objects, 1)
 	assert.Equal(d.t, d.testFileName, *objects[0].Key)
 }
 
 func (d *testData) deleteObjects() {
-	err := DeleteObject(d.sourceBucketName, d.testFileName)
+	err := DeleteObject(d.client, d.sourceBucketName, d.testFileName)
 	assert.NoError(d.t, err)
 
-	objects, err := ListObject(d.sourceBucketName)
+	objects, err := ListObjects(d.client, d.sourceBucketName)
 	assert.NoError(d.t, err)
 	assert.Len(d.t, objects, 0)
 
-	err = DeleteObject(d.destBucketName, d.testFileName)
+	err = DeleteObject(d.client, d.destBucketName, d.testFileName)
 	assert.NoError(d.t, err)
 
-	objects, err = ListObject(d.destBucketName)
+	objects, err = ListObjects(d.client, d.destBucketName)
 	assert.NoError(d.t, err)
 	assert.Len(d.t, objects, 0)
 }
 
 func (d *testData) deleteBuckets() {
-	err := DeleteBucket(d.sourceBucketName)
+	err := DeleteBucket(d.client, d.sourceBucketName)
 	assert.NoError(d.t, err)
-	err = DeleteBucket(d.destBucketName)
+	err = DeleteBucket(d.client, d.destBucketName)
 	assert.NoError(d.t, err)
 
-	buckets, err := ListBucket()
+	buckets, err := ListBuckets(d.client)
 	assert.NoError(d.t, err)
 	namesOfBucket := helper.GetNamesOfBucket(buckets)
 	assert.NotContains(d.t, namesOfBucket, d.sourceBucketName)
