@@ -10,11 +10,9 @@ import (
 func TestBucket(t *testing.T) {
 	bucketName := uuid.New().String()
 
-	session, err := CreateSession()
-	assert.NoError(t, err)
-	client := S3Client{session: session}
+	client := getS3Client(t, true)
 
-	err = CreateBucket(client, bucketName)
+	err := CreateBucket(client, bucketName)
 	assert.NoError(t, err)
 
 	buckets, err := ListBuckets(client)
@@ -29,4 +27,13 @@ func TestBucket(t *testing.T) {
 	assert.NoError(t, err)
 	namesOfBucket = helper.GetNamesOfBucket(buckets)
 	assert.NotContains(t, namesOfBucket, bucketName)
+}
+
+func getS3Client(t *testing.T, isMock bool) s3Client {
+	if isMock {
+		return MockS3Client{mockS3: make(map[string]map[string]*mockS3Object)}
+	}
+	session, err := CreateSession()
+	assert.NoError(t, err)
+	return S3Client{session: session}
 }

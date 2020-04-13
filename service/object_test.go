@@ -10,7 +10,7 @@ import (
 
 type testData struct {
 	t                *testing.T
-	client           S3Client
+	client           s3Client
 	sourceBucketName string
 	destBucketName   string
 	testFileName     string
@@ -20,7 +20,7 @@ type testData struct {
 }
 
 func TestObject(t *testing.T) {
-	test := initTest(t)
+	test := initTest(t, true)
 	test.createTestFile()
 	test.createBuckets()
 	test.uploadObject()
@@ -31,10 +31,8 @@ func TestObject(t *testing.T) {
 	test.deleteTestFiles()
 }
 
-func initTest(t *testing.T) *testData {
-	session, err := CreateSession()
-	assert.NoError(t, err)
-	client := S3Client{session: session}
+func initTest(t *testing.T, isMock bool) *testData {
+	client := getS3Client(t, isMock)
 
 	return &testData{
 		t:                t,
