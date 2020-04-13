@@ -10,18 +10,22 @@ import (
 func TestBucket(t *testing.T) {
 	bucketName := uuid.New().String()
 
-	err := CreateBucket(bucketName)
+	session, err := CreateSession()
+	assert.NoError(t, err)
+	client := S3Client{session: session}
+
+	err = CreateBucket(client, bucketName)
 	assert.NoError(t, err)
 
-	buckets, err := ListBucket()
+	buckets, err := ListBuckets(client)
 	assert.NoError(t, err)
 	namesOfBucket := helper.GetNamesOfBucket(buckets)
 	assert.Contains(t, namesOfBucket, bucketName)
 
-	err = DeleteBucket(bucketName)
+	err = DeleteBucket(client, bucketName)
 	assert.NoError(t, err)
 
-	buckets, err = ListBucket()
+	buckets, err = ListBuckets(client)
 	assert.NoError(t, err)
 	namesOfBucket = helper.GetNamesOfBucket(buckets)
 	assert.NotContains(t, namesOfBucket, bucketName)
