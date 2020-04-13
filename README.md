@@ -1,6 +1,7 @@
 # Amazon S3 implementation with Go
 
-This project implements the basic AWS S3 services for Go.
+This project implements the basic AWS S3 services for Go. Besides, this project also demonstrate how to complete 
+the mock testing by dependency injection with the interface.
 
 ## Install the AWS SDK for GO
 
@@ -58,3 +59,22 @@ type s3Client interface {
 	deleteObject(bucket string, objectKey string) error
 }
 ```
+
+## Unit Testing by Mock Implementation of the Interface
+
+We use two data structures to simulate the behavior of S3 service, i.e., 
+
+```go
+type MockS3Client struct {
+	// The first map key is bucket name, and the second one is object key.
+	mockS3 map[string]map[string]*mockS3Object
+}
+
+type mockS3Object struct {
+	size    int64
+	content []byte
+}
+``` 
+
+Then we complete all the mock implementations of the interface `s3client` by above two struct 
+in the `mock_s3_client.go`.
